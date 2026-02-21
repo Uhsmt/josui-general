@@ -70,7 +70,7 @@ class BioReactionAnimation {
             wobbleFreq: 1.2,       // 揺らぎの周波数
 
             // 軌道の速度（進行度/秒）
-            baseSpeed: 0.05,
+            baseSpeed: 0.04,
             speedVariation: 0.03,
 
             // 外周エリアの定義（キャンバス比率）
@@ -107,6 +107,9 @@ class BioReactionAnimation {
 
                 // 揺らぎ用シード
                 this.wobbleSeed = Math.random() * 1000;
+
+                // 上昇時の広がり具合（泡ごとにランダム、0=まっすぐ、1=大きく広がる）
+                this.spreadFactor = Math.random();
 
                 // 位置とアルファ
                 this.x = 0;
@@ -147,16 +150,24 @@ class BioReactionAnimation {
                 let x, y;
                 const p = this.progress;
 
+                // Phase1終了時の広がり量（泡ごとに異なる）
+                const maxSpreadAmount = (rightX - leftX) * 0.2 * this.spreadFactor;
+                // Phase1終了時のX座標
+                const phase1EndX = rightX - maxSpreadAmount;
+
                 if (p < phase1Ratio) {
-                    // Phase 1: 右辺を上昇（右下 → 右上）
+                    // Phase 1: 右辺を上昇（右下 → 右上）ふんわり左に広がりながら
                     const localP = p / phase1Ratio;
-                    x = rightX;
+                    // 上昇しながら徐々に左に広がる（ease-out風）
+                    const spreadProgress = 1 - Math.pow(1 - localP, 2);
+                    const spreadAmount = maxSpreadAmount * spreadProgress;
+                    x = rightX - spreadAmount;
                     y = bottomY - (bottomY - topY) * localP;
                     this.alpha = 1;
                 } else if (p < phase1Ratio + phase2Ratio) {
-                    // Phase 2: 上辺を左へ（右上 → 左上）
+                    // Phase 2: 上辺を左へ（Phase1終了地点 → 左上）
                     const localP = (p - phase1Ratio) / phase2Ratio;
-                    x = rightX - (rightX - leftX) * localP;
+                    x = phase1EndX - (phase1EndX - leftX) * localP;
                     y = topY;
                     this.alpha = 1;
                 } else if (p < 1) {
