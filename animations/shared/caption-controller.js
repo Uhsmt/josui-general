@@ -113,6 +113,9 @@ class CaptionController {
         if (this.pauseIndicator) {
             this.pauseIndicator.classList.add('visible');
         }
+        if (this.highlightLayer) {
+            this.highlightLayer.classList.add('paused');
+        }
     }
 
     resume() {
@@ -122,6 +125,9 @@ class CaptionController {
         }
         if (this.pauseIndicator) {
             this.pauseIndicator.classList.remove('visible');
+        }
+        if (this.highlightLayer) {
+            this.highlightLayer.classList.remove('paused');
         }
         this.intervalId = setInterval(() => {
             this.nextCaption();

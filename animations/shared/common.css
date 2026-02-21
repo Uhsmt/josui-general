@@ -230,6 +230,11 @@ body {
   animation: pulse 1.5s ease-in-out infinite;
 }
 
+/* 一時停止中はハイライトのアニメーションを停止 */
+.highlight-layer.paused .highlight-area {
+  animation-play-state: paused;
+}
+
 /* 説明セクション（下部固定） */
 .description-section {
   width: 100%;
@@ -307,24 +312,23 @@ body {
 /* 一時停止インジケーター */
 .pause-indicator {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.5);
+  bottom: 2.5vh;
+  right: 20px;
   display: flex;
-  gap: 8px;
-  padding: 20px 24px;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 16px;
+  gap: 6px;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+  transition: opacity 0.3s ease, visibility 0.3s;
   z-index: 9999;
   pointer-events: none;
 }
 
 .pause-indicator span {
-  width: 8px;
-  height: 32px;
+  width: 6px;
+  height: 24px;
   background: white;
   border-radius: 2px;
 }
@@ -332,7 +336,6 @@ body {
 .pause-indicator.visible {
   opacity: 1;
   visibility: visible;
-  transform: translate(-50%, -50%) scale(1);
 }
 
 
