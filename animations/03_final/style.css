@@ -5,8 +5,8 @@
 }
 
 #bubble-2 {
-    top: 0%;
-    left: 45%;
+    top: -3%;
+    left: 42%;
 }
 
 #bubble-3 {
@@ -31,8 +31,8 @@
 }
 
 #arrow-2 {
-    top: 5%;
-    left: 45%;
+    top: -3%;
+    left: 31%;
 }
 
 #arrow-3 {
@@ -58,4 +58,33 @@
 #suisui-ref{
     width: 120px;
     height: 120px;
+}
+
+/* Scum Skimmer */
+.scum-skimmer-container {
+    position: absolute;
+    top: 2%;
+    left: 29%;
+    width: 6%;
+    height: 12%;
+    z-index: 5;
+}
+
+.scum-skimmer {
+    width: 100%;
+    height: 100%;
+    transform-origin: center center;
+    animation: skimmer-tilt 6s ease-in-out infinite;
+}
+
+@keyframes skimmer-tilt {
+    0% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(-90deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
 }
