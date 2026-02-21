@@ -57,120 +57,196 @@ class BioReactionAnimation {
     createBubbleAnimation(canvasId) {
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
-        
+
         const ctx = canvas.getContext('2d', { alpha: true });
         const dpr = Math.max(1, devicePixelRatio || 1);
-        
+
+        // 設定
         const CFG = {
-            spawnPerSec: 10.5,  // 15 * 0.7
-            baseRise: 21,       // 30 * 0.7
-            randomRise: 10.5,   // 15 * 0.7
-            baseSize: 3.5,      // 泡のベースサイズを大きく
-            growMax: 8.0,       // 泡の最大サイズも大きく
-            fadeRate: 1.2,
-            wobbleAmp: 12,      // 揺らぎも2倍
-            wobbleFreq: 0.7,    // 1.0 * 0.7
-            nozzleWidthRatio: 0.2,  // 散気口をさらに狭く
-            eccMin: 0.8,
-            eccMax: 1.0,
-            fanSpread: 1.2  // 扇形拡散をさらに大きく
+            spawnPerSec: 2.5,      // 秒あたり発生数
+            baseSize: 4,           // 基準サイズ
+            sizeVariation: 4,      // サイズばらつき
+            wobbleAmp: 5,          // ふわふわ揺らぎの振幅
+            wobbleFreq: 1.2,       // 揺らぎの周波数
+
+            // 軌道の速度（進行度/秒）
+            baseSpeed: 0.05,
+            speedVariation: 0.03,
+
+            // 外周エリアの定義（キャンバス比率）
+            // 外側マージン（キャンバス端からの距離）
+            marginTop: 0.05,
+            marginBottom: 0.05,
+            marginLeft: 0.05,
+            marginRight: 0.05,
+            // 内側空白エリア（中央の空白部分）
+            innerTop: 0.18,
+            innerBottom: 0.02,
+            innerLeft: 0.22,
+            innerRight: 0.03
         };
-        
+
         class Bubble {
-            constructor(t) { this.reset(t) }
-            reset(t) {
-                const W = canvas.width / dpr;
-                const H = canvas.height / dpr;
-                const nozzleW = W * CFG.nozzleWidthRatio;
-                this.x0 = W;  // 右端から発生
-                this.y = H + 8;
-                this.vy = -(CFG.baseRise + Math.random()*CFG.randomRise);
-                this.birth = t;
-                this.xDrift = -Math.random();  // 左方向への拡散（0～-1）
-                this.wSeed = Math.random()*1000;
-                this.baseR = CFG.baseSize + Math.random()*1.2;
-                this.maxA = 1.0;
-                this.initialAlpha = 1.0;  // 初期不透明度100%
-                this.ecc = CFG.eccMin + Math.random()*(CFG.eccMax-CFG.eccMin);
+            constructor(t, initialProgress = 0) {
+                this.init(t, initialProgress);
             }
+
+            init(t, initialProgress = 0) {
+                this.birth = t;
+                this.progress = initialProgress;  // 0〜1で軌道上の位置
+                this.dead = false;
+
+                // 速度（泡ごとにばらつき）
+                this.speed = CFG.baseSpeed + (Math.random() - 0.5) * CFG.speedVariation;
+
+                // 外周のどの辺りを通るか（0=内側寄り、1=外側寄り）
+                this.pathOffset = Math.random();
+
+                // 泡のサイズ
+                this.r = CFG.baseSize + Math.random() * CFG.sizeVariation;
+
+                // 揺らぎ用シード
+                this.wobbleSeed = Math.random() * 1000;
+
+                // 位置とアルファ
+                this.x = 0;
+                this.y = 0;
+                this.alpha = 1;
+            }
+
             update(dt, t) {
                 const W = canvas.width / dpr;
                 const H = canvas.height / dpr;
-                this.y += this.vy * dt;
-                const k = 1 - (this.y / H);
-                this.r = this.baseR * (1 + (CFG.growMax/CFG.baseSize - 1) * Math.min(1, k));
-                // 下部では不透明度100%、上部に行くほどフェードアウト
-                this.alpha = k < 0.3 ? this.initialAlpha : Math.max(0, this.maxA * (1 - k*CFG.fadeRate));
-                const fan = (this.y < H) ? (H - this.y) / H : 0;
-                const spread = (this.xDrift * CFG.fanSpread * fan * W);
-                const wobble = Math.sin(this.wSeed + t * CFG.wobbleFreq) * CFG.wobbleAmp * k;
-                this.x = this.x0 + spread + wobble;
-                if (this.y + this.r < -12 || this.alpha <= 0.02) this.reset(t);
+
+                // 進行度を更新
+                this.progress += this.speed * dt;
+
+                // 軌道の各区間の長さ（比率）
+                // Phase1: 右辺上昇, Phase2: 上辺左移動, Phase3: 左辺下降
+                const phase1Ratio = 0.35;  // 右辺（上昇）
+                const phase2Ratio = 0.35;  // 上辺（左移動）
+                const phase3Ratio = 0.30;  // 左辺（下降+フェードアウト）
+
+                // 外周の境界を計算
+                const outerLeft = W * CFG.marginLeft;
+                const outerRight = W * (1 - CFG.marginRight);
+                const outerTop = H * CFG.marginTop;
+                const outerBottom = H * (1 - CFG.marginBottom);
+
+                const innerLeft = W * CFG.innerLeft;
+                const innerRight = W * (1 - CFG.innerRight);
+                const innerTop = H * CFG.innerTop;
+                const innerBottom = H * (1 - CFG.innerBottom);
+
+                // pathOffsetに基づいて通る位置を決定
+                const rightX = innerRight + (outerRight - innerRight) * this.pathOffset;
+                const leftX = outerLeft + (innerLeft - outerLeft) * this.pathOffset;
+                const topY = outerTop + (innerTop - outerTop) * this.pathOffset;
+                const bottomY = innerBottom + (outerBottom - innerBottom) * this.pathOffset;
+
+                let x, y;
+                const p = this.progress;
+
+                if (p < phase1Ratio) {
+                    // Phase 1: 右辺を上昇（右下 → 右上）
+                    const localP = p / phase1Ratio;
+                    x = rightX;
+                    y = bottomY - (bottomY - topY) * localP;
+                    this.alpha = 1;
+                } else if (p < phase1Ratio + phase2Ratio) {
+                    // Phase 2: 上辺を左へ（右上 → 左上）
+                    const localP = (p - phase1Ratio) / phase2Ratio;
+                    x = rightX - (rightX - leftX) * localP;
+                    y = topY;
+                    this.alpha = 1;
+                } else if (p < 1) {
+                    // Phase 3: 左辺を下降（左上 → 左下）+ フェードアウト
+                    const localP = (p - phase1Ratio - phase2Ratio) / phase3Ratio;
+                    x = leftX;
+                    y = topY + (bottomY - topY) * localP;
+                    // フェードアウト（後半でより急速に）
+                    this.alpha = Math.max(0, 1 - Math.pow(localP, 0.7));
+                } else {
+                    // 軌道完了
+                    this.dead = true;
+                    return;
+                }
+
+                // ふわふわ揺らぎを追加
+                const wobbleX = Math.sin(this.wobbleSeed + t * CFG.wobbleFreq) * CFG.wobbleAmp;
+                const wobbleY = Math.cos(this.wobbleSeed * 1.3 + t * CFG.wobbleFreq * 0.8) * CFG.wobbleAmp * 0.7;
+
+                this.x = x + wobbleX;
+                this.y = y + wobbleY;
             }
+
             draw() {
+                if (this.dead || this.alpha <= 0.01) return;
                 ctx.globalAlpha = this.alpha;
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.scale(1, this.ecc);
                 ctx.beginPath();
-                ctx.arc(0, 0, this.r, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(173, 216, 230, 0.9)';
+                ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(173, 216, 230, 0.85)';
                 ctx.fill();
-                ctx.restore();
                 ctx.globalAlpha = 1;
             }
         }
-        
+
         let bubbles = [];
         let spawnCarry = 0;
-        let W = 0, H = 0;
-        
+
         function resize() {
             const r = canvas.getBoundingClientRect();
-            W = Math.max(50, Math.floor(r.width * dpr));
-            H = Math.max(100, Math.floor(r.height * dpr));
+            const W = Math.max(50, Math.floor(r.width * dpr));
+            const H = Math.max(100, Math.floor(r.height * dpr));
             canvas.width = W;
             canvas.height = H;
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
-        
+
         resize();
-        window.addEventListener('resize', resize, {passive: true});
-        
-        // 初期の気泡を配置
+        window.addEventListener('resize', resize, { passive: true });
+
+        // 初期の気泡を軌道上に分散配置
         const t0 = performance.now() / 1000;
-        for (let i = 0; i < 15; i++) {
-            const b = new Bubble(t0);
-            b.y = (H / dpr) - ((H / dpr) * i / 15) * 0.98;
-            b.alpha = Math.random() * 0.4;
-            bubbles.push(b);
+        for (let i = 0; i < 20; i++) {
+            // Phase1とPhase2の範囲に分散（0〜0.7）
+            const initialProgress = Math.random() * 0.65;
+            bubbles.push(new Bubble(t0, initialProgress));
         }
-        
+
         let prev = performance.now() / 1000;
+
         function loop() {
             const now = performance.now() / 1000;
-            let dt = Math.min(0.033, now - prev);
+            const dt = Math.min(0.05, now - prev);
             prev = now;
-            
+
+            // 死んだ泡を除去
+            bubbles = bubbles.filter(b => !b.dead);
+
+            // 新しい泡を右下から発生
             spawnCarry += CFG.spawnPerSec * dt;
             while (spawnCarry >= 1) {
-                bubbles.push(new Bubble(now));
+                bubbles.push(new Bubble(now, 0));
                 spawnCarry -= 1;
             }
-            
-            if (bubbles.length > 60) bubbles.splice(0, bubbles.length - 60);
-            
+
+            // 泡の数を制限
+            if (bubbles.length > 50) {
+                bubbles.splice(0, bubbles.length - 50);
+            }
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            bubbles.sort((a, b) => a.r - b.r);
+
+            // 更新と描画
             for (const b of bubbles) {
                 b.update(dt, now);
                 b.draw();
             }
-            
+
             requestAnimationFrame(loop);
         }
-        
+
         loop();
     }
 }
