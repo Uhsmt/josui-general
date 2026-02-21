@@ -593,8 +593,11 @@ class GravelAnimation {
         // 次のエリアでの位置と速度を設定
         switch(nextArea.direction) {
             case 'up':  // area2: 下から上（area3から遷移）
-                // 絶対位置を維持しつつ、エリア内にクランプ
-                particle.x = Math.max(radius, Math.min(containerWidth - radius, localPos.x));
+                // area2は幅が狭いので、元のy座標をx座標にマッピングして左右に分散
+                const currentContainerHeight = currentArea.container.offsetHeight;
+                const yRatio = particle.y / currentContainerHeight; // 0〜1
+                particle.x = radius + yRatio * (containerWidth - radius * 2);
+                // y座標は絶対位置を維持
                 particle.y = Math.max(radius, Math.min(containerHeight - radius, localPos.y));
                 particle.speedX = 0;
                 particle.speedY = -this.config.scraperSpeed;
