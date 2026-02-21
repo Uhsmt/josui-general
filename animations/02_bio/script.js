@@ -80,9 +80,9 @@ class BioReactionAnimation {
             marginLeft: 0.05,
             marginRight: 0.10,
             // 内側空白エリア（中央の空白部分）
-            innerTop: 0.18,
+            innerTop: 0.25,
             innerBottom: 0.01,
-            innerLeft: 0.10,
+            innerLeft: 0.20,
             innerRight: 0.20
         };
 
@@ -227,6 +227,10 @@ class BioReactionAnimation {
                 ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
                 ctx.fillStyle = 'rgba(173, 216, 230, 0.85)';
                 ctx.fill();
+                // 白い縁取り
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
                 ctx.globalAlpha = 1;
             }
         }
