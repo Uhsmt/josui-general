@@ -78,12 +78,12 @@ class BioReactionAnimation {
             marginTop: 0.05,
             marginBottom: 0.05,
             marginLeft: 0.05,
-            marginRight: 0.05,
+            marginRight: 0.10,
             // 内側空白エリア（中央の空白部分）
             innerTop: 0.18,
-            innerBottom: 0.02,
-            innerLeft: 0.22,
-            innerRight: 0.03
+            innerBottom: 0.01,
+            innerLeft: 0.10,
+            innerRight: 0.20
         };
 
         class Bubble {
@@ -125,10 +125,12 @@ class BioReactionAnimation {
                 this.progress += this.speed * dt;
 
                 // 軌道の各区間の長さ（比率）
-                // Phase1: 右辺上昇, Phase2: 上辺左移動, Phase3: 左辺下降
-                const phase1Ratio = 0.35;  // 右辺（上昇）
-                const phase2Ratio = 0.35;  // 上辺（左移動）
-                const phase3Ratio = 0.30;  // 左辺（下降+フェードアウト）
+                // Phase1: 右辺上昇, Corner1: 右上角カーブ, Phase2: 上辺左移動, Corner2: 左上角カーブ, Phase3: 左辺下降
+                const phase1Ratio = 0.30;   // 右辺（上昇）
+                const corner1Ratio = 0.08;  // 右上角カーブ
+                const phase2Ratio = 0.27;   // 上辺（左移動）
+                const corner2Ratio = 0.08;  // 左上角カーブ
+                const phase3Ratio = 0.27;   // 左辺（下降+フェードアウト）
 
                 // 外周の境界を計算
                 const outerLeft = W * CFG.marginLeft;
@@ -155,26 +157,53 @@ class BioReactionAnimation {
                 // Phase1終了時のX座標
                 const phase1EndX = rightX - maxSpreadAmount;
 
-                if (p < phase1Ratio) {
-                    // Phase 1: 右辺を上昇（右下 → 右上）ふんわり左に広がりながら
+                const p1End = phase1Ratio;
+                const c1End = p1End + corner1Ratio;
+                const p2End = c1End + phase2Ratio;
+                const c2End = p2End + corner2Ratio;
+
+                // Phase1は上端の少し手前（90%）まで上昇し、Corner1で残りを上昇しながらカーブ
+                const phase1TopY = topY + (bottomY - topY) * 0.1;  // 上端の90%まで
+
+                if (p < p1End) {
+                    // Phase 1: 右辺を上昇（右下 → 右上手前）ふんわり左に広がりながら
                     const localP = p / phase1Ratio;
                     // 上昇しながら徐々に左に広がる（ease-out風）
                     const spreadProgress = 1 - Math.pow(1 - localP, 2);
                     const spreadAmount = maxSpreadAmount * spreadProgress;
                     x = rightX - spreadAmount;
-                    y = bottomY - (bottomY - topY) * localP;
+                    y = bottomY - (bottomY - phase1TopY) * localP;
                     this.alpha = 1;
-                } else if (p < phase1Ratio + phase2Ratio) {
-                    // Phase 2: 上辺を左へ（Phase1終了地点 → 左上）
-                    const localP = (p - phase1Ratio) / phase2Ratio;
-                    x = phase1EndX - (phase1EndX - leftX) * localP;
+                } else if (p < c1End) {
+                    // Corner 1: 右上角をカーブ（残りの上昇 + 左への移動開始）
+                    const localP = (p - p1End) / corner1Ratio;
+                    const curveP = Math.sin(localP * Math.PI / 2);  // ease-in-out風
+                    x = phase1EndX - (phase1EndX - leftX) * curveP * 0.15;
+                    // 残りの上昇をしながらカーブ
+                    y = phase1TopY - (phase1TopY - topY) * curveP;
+                    this.alpha = 1;
+                } else if (p < p2End) {
+                    // Phase 2: 上辺を左へ（右上 → 左上手前）
+                    const localP = (p - c1End) / phase2Ratio;
+                    const startX = phase1EndX - (phase1EndX - leftX) * 0.15;
+                    const endX = leftX + (phase1EndX - leftX) * 0.15;
+                    x = startX - (startX - endX) * localP;
                     y = topY;
+                    this.alpha = 1;
+                } else if (p < c2End) {
+                    // Corner 2: 左上角をカーブ
+                    const localP = (p - p2End) / corner2Ratio;
+                    const curveP = Math.sin(localP * Math.PI / 2);
+                    const cornerStartX = leftX + (phase1EndX - leftX) * 0.15;
+                    x = cornerStartX - (cornerStartX - leftX) * curveP;
+                    y = topY + (bottomY - topY) * localP * 0.08;
                     this.alpha = 1;
                 } else if (p < 1) {
                     // Phase 3: 左辺を下降（左上 → 左下）+ フェードアウト
-                    const localP = (p - phase1Ratio - phase2Ratio) / phase3Ratio;
+                    const localP = (p - c2End) / phase3Ratio;
+                    const startY = topY + (bottomY - topY) * 0.08;
                     x = leftX;
-                    y = topY + (bottomY - topY) * localP;
+                    y = startY + (bottomY - startY) * localP;
                     // フェードアウト（後半でより急速に）
                     this.alpha = Math.max(0, 1 - Math.pow(localP, 0.7));
                 } else {
