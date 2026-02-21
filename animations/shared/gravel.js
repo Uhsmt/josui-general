@@ -45,6 +45,35 @@ class GravelAnimation {
         this.animate();
     }
 
+    // エリアの絶対位置（親コンテナ基準）を取得
+    getAreaOffset(area) {
+        if (!area || !area.element) return { left: 0, top: 0 };
+        const rect = area.element.getBoundingClientRect();
+        const parentRect = area.element.parentElement.getBoundingClientRect();
+        return {
+            left: rect.left - parentRect.left,
+            top: rect.top - parentRect.top
+        };
+    }
+
+    // ローカル座標から絶対座標に変換
+    toAbsolutePosition(area, localX, localY) {
+        const offset = this.getAreaOffset(area);
+        return {
+            x: offset.left + localX,
+            y: offset.top + localY
+        };
+    }
+
+    // 絶対座標からローカル座標に変換
+    toLocalPosition(area, absX, absY) {
+        const offset = this.getAreaOffset(area);
+        return {
+            x: absX - offset.left,
+            y: absY - offset.top
+        };
+    }
+
     init() {
         this.areas.forEach(area => {
             const element = document.getElementById(area.id);
@@ -429,6 +458,24 @@ class GravelAnimation {
             particle.x += particle.speedX * deltaFactor;
             particle.y += particle.speedY * deltaFactor;
 
+            // area-1での三角形収束ロジック
+            // 右下を直角、左上を頂点とした直角三角形内に収束
+            if (particle.currentArea === 'gravel-area-1') {
+                const xRatio = particle.x / containerWidth; // 1→0 (右端→左端)
+                const maxY = containerHeight * xRatio; // 三角形の斜辺
+
+                // yが斜辺より下にある場合、斜辺上に制約
+                if (particle.y > maxY) {
+                    particle.y = maxY;
+                }
+
+                // 左端に近づくにつれて、左上の点に向かって引き寄せる
+                if (xRatio < 0.4) {
+                    const pullFactor = (0.4 - xRatio) / 0.4; // 0→1
+                    particle.y -= particle.y * pullFactor * 0.03 * deltaFactor;
+                }
+            }
+
             // エリアの境界チェック（円の端が境界に達したときに遷移）
             const radius = particle.radius || this.config.particleSize / 2;
             let needsTransition = false;
@@ -466,8 +513,17 @@ class GravelAnimation {
 
             // 位置を反映（揺れを含む、境界内にクランプ）
             // 中心位置をクランプ（半径分の余白を確保）
-            const finalX = Math.max(radius, Math.min(containerWidth - radius, particle.x + wobbleX));
-            const finalY = Math.max(radius, Math.min(containerHeight - radius, particle.y + wobbleY));
+            let finalX = Math.max(radius, Math.min(containerWidth - radius, particle.x + wobbleX));
+            let finalY = Math.max(radius, Math.min(containerHeight - radius, particle.y + wobbleY));
+
+            // area-1では三角形制約を揺れ後の位置にも適用
+            if (particle.currentArea === 'gravel-area-1') {
+                const xRatio = finalX / containerWidth;
+                const maxY = containerHeight * xRatio;
+                if (finalY > maxY) {
+                    finalY = maxY;
+                }
+            }
 
             // CSS leftは要素の左端なので、中心位置から半径を引く
             particle.element.style.left = `${finalX - radius}px`;
@@ -514,6 +570,11 @@ class GravelAnimation {
 
         if (!currentArea || !nextArea || !nextArea.container) return;
 
+        const radius = particle.radius || this.config.particleSize / 2;
+
+        // 現在の絶対位置を計算
+        const absPos = this.toAbsolutePosition(currentArea, particle.x, particle.y);
+
         // 現在のエリアから要素を削除
         if (particle.element.parentNode === currentArea.container) {
             currentArea.container.removeChild(particle.element);
@@ -523,29 +584,25 @@ class GravelAnimation {
         nextArea.container.appendChild(particle.element);
         particle.currentArea = nextAreaId;
 
-        // 次のエリアの開始位置と速度を設定
-        const currentContainerWidth = currentArea.container.offsetWidth;
-        const currentContainerHeight = currentArea.container.offsetHeight;
+        // 絶対位置から次のエリアのローカル座標に変換
+        const localPos = this.toLocalPosition(nextArea, absPos.x, absPos.y);
+
         const containerWidth = nextArea.container.offsetWidth;
         const containerHeight = nextArea.container.offsetHeight;
-        const radius = particle.radius || this.config.particleSize / 2;
 
+        // 次のエリアでの位置と速度を設定
         switch(nextArea.direction) {
             case 'up':  // area2: 下から上（area3から遷移）
-                // area3のy座標をarea2のx座標にマッピング
-                const ratio3to2 = containerWidth / currentContainerHeight;
-                const prevY = particle.y;  // 遷移前のy座標を保存
-                particle.x = Math.max(radius, Math.min(containerWidth - radius, prevY * ratio3to2));
-                particle.y = containerHeight - radius;  // 下端から半径分内側
+                // 絶対位置を維持しつつ、エリア内にクランプ
+                particle.x = Math.max(radius, Math.min(containerWidth - radius, localPos.x));
+                particle.y = Math.max(radius, Math.min(containerHeight - radius, localPos.y));
                 particle.speedX = 0;
                 particle.speedY = -this.config.scraperSpeed;
                 break;
             case 'left':  // area1: 右から左（area2から遷移）
-                // area2のx座標をarea1のy座標にマッピング
-                const ratio2to1 = containerHeight / currentContainerWidth;
-                const prevX = particle.x;  // 遷移前のx座標を保存
-                particle.x = containerWidth - radius;  // 右端から半径分内側
-                particle.y = Math.max(radius, Math.min(containerHeight - radius, prevX * ratio2to1));
+                // 絶対位置を維持しつつ、エリア内にクランプ
+                particle.x = Math.max(radius, Math.min(containerWidth - radius, localPos.x));
+                particle.y = Math.max(radius, Math.min(containerHeight - radius, localPos.y));
                 particle.speedX = -this.config.scraperSpeed;
                 particle.speedY = 0;
                 break;
