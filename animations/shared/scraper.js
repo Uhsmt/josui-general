@@ -1,27 +1,28 @@
-// 最初沈殿池アニメーション制御
+// 最初沈殿池アニメーション制御（台形トラック版）
 class ShochinAnimation {
     constructor(options = {}) {
         this.animationId = null;
         this.blades = [];
         this.isPaused = false;
         this.reverseDirection = options.reverse || false;
+        this.lastTime = performance.now(); // 時間管理用
 
         this.init();
         this.setupControls();
         this.initScraper();
     }
-    
+
     init() {
-        console.log('最初沈殿池アニメーション開始');
-        
+        console.log('最初沈殿池アニメーション開始（台形版）');
+
         // レスポンシブ対応
         this.handleResize();
         window.addEventListener('resize', () => this.handleResize());
-        
+
         // フルスクリーン対応
         this.setupFullscreen();
     }
-    
+
     handleResize() {
         // SVGサイズが変わった場合、スクレーパーも再初期化
         if (this.animationId) {
@@ -33,7 +34,7 @@ class ShochinAnimation {
         }
         console.log('レイアウト自動調整完了');
     }
-    
+
     setupFullscreen() {
         document.addEventListener('keydown', (event) => {
             if (event.key === 'f' || event.key === 'F') {
@@ -43,13 +44,13 @@ class ShochinAnimation {
                 this.exitFullscreen();
             }
         });
-        
+
         // ダブルクリックでフルスクリーン
         document.addEventListener('dblclick', () => {
             this.toggleFullscreen();
         });
     }
-    
+
     toggleFullscreen() {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch(err => {
@@ -59,13 +60,13 @@ class ShochinAnimation {
             document.exitFullscreen();
         }
     }
-    
+
     exitFullscreen() {
         if (document.fullscreenElement) {
             document.exitFullscreen();
         }
     }
-    
+
     setupControls() {
         // スペースキーでアニメーション一時停止/再開
         document.addEventListener('keydown', (event) => {
@@ -75,7 +76,7 @@ class ShochinAnimation {
             }
         });
     }
-    
+
     toggleAnimation() {
         if (this.isPaused) {
             this.startScraper();
@@ -87,36 +88,26 @@ class ShochinAnimation {
             console.log('アニメーション一時停止');
         }
     }
-    
-    // === スクレーパーアニメーション関連 ===
-    
+
+    // === スクレーパーアニメーション関連（台形版） ===
+
     initScraper() {
         // === 基準サイズ（手動調整で最適だった値） ===
         const BASE_IMAGE_SIZE = { width: 1000, height: 750 };
         const BASE_CONFIG = {
             borderWidth: 9,
             bladeSize: 20,
-            bladeSpacing: 100,
-            speed: 0.8,
-            main: {
-                top: 120,
-                left: 390,
-                width: 210,
-                height: 290
-            },
-            extension: {
-                top: 270,
-                left: 70,
-                width: 320,
-                height: 140
-            },
-            borderPartial: {
-                top: 120,
-                left: 390,
-                height: 158
+            bladeSpacing: 60,  // 間隔を狭めてブレード数をさらに増加
+            speed: 0.56,  // 0.8 * 0.7
+            // 台形の4つの頂点を定義
+            trapezoid: {
+                topLeft: { x: 390, y: 120 },      // 上辺左端
+                topRight: { x: 600, y: 120 },     // 上辺右端
+                bottomRight: { x: 600, y: 410 },  // 下辺右端
+                bottomLeft: { x: 70, y: 410 }     // 下辺左端（extension底辺左）
             }
         };
-        
+
         // === 現在の画像サイズを取得してスケール計算 ===
         const baseImage = document.querySelector('.base-image');
         const currentImageSize = {
@@ -134,46 +125,33 @@ class ShochinAnimation {
             bladeSpacing: Math.round(BASE_CONFIG.bladeSpacing * scaleX),
             speed: BASE_CONFIG.speed,
 
-            main: {
-                top: Math.round(BASE_CONFIG.main.top * scaleY),
-                left: Math.round(BASE_CONFIG.main.left * scaleX),
-                width: Math.round(BASE_CONFIG.main.width * scaleX),
-                height: Math.round(BASE_CONFIG.main.height * scaleY)
-            },
-
-            extension: {
-                top: Math.round(BASE_CONFIG.extension.top * scaleY),
-                left: Math.round(BASE_CONFIG.extension.left * scaleX),
-                width: Math.round(BASE_CONFIG.extension.width * scaleX),
-                height: Math.round(BASE_CONFIG.extension.height * scaleY)
-            },
-
-            borderPartial: {
-                top: Math.round(BASE_CONFIG.borderPartial.top * scaleY),
-                left: Math.round(BASE_CONFIG.borderPartial.left * scaleX),
-                height: Math.round(BASE_CONFIG.borderPartial.height * scaleY)
+            // 台形の頂点をスケーリング
+            trapezoid: {
+                topLeft: {
+                    x: Math.round(BASE_CONFIG.trapezoid.topLeft.x * scaleX),
+                    y: Math.round(BASE_CONFIG.trapezoid.topLeft.y * scaleY)
+                },
+                topRight: {
+                    x: Math.round(BASE_CONFIG.trapezoid.topRight.x * scaleX),
+                    y: Math.round(BASE_CONFIG.trapezoid.topRight.y * scaleY)
+                },
+                bottomRight: {
+                    x: Math.round(BASE_CONFIG.trapezoid.bottomRight.x * scaleX),
+                    y: Math.round(BASE_CONFIG.trapezoid.bottomRight.y * scaleY)
+                },
+                bottomLeft: {
+                    x: Math.round(BASE_CONFIG.trapezoid.bottomLeft.x * scaleX),
+                    y: Math.round(BASE_CONFIG.trapezoid.bottomLeft.y * scaleY)
+                }
             }
         };
-        
-        // === 軌道設定（スケール済みの値を使用） ===
-        this.track = {
-            main: {
-                top: this.CONFIG.main.top,
-                left: this.CONFIG.main.left,
-                width: this.CONFIG.main.width,
-                height: this.CONFIG.main.height
-            },
-            extension: {
-                top: this.CONFIG.extension.top,
-                left: this.CONFIG.extension.left,
-                width: this.CONFIG.extension.width,
-                height: this.CONFIG.extension.height
-            }
-        };
-        
-        this.perimeter = this.calculateLPerimeter();
+
+        // === 軌道設定 ===
+        this.track = this.CONFIG.trapezoid;
+
+        this.perimeter = this.calculateTrapezoidPerimeter();
         this.bladeCount = Math.floor(this.perimeter / this.CONFIG.bladeSpacing);
-        
+
         // スタイルとトラック初期化
         this.initBladeStyles();
         this.initTrackStyles();
@@ -181,36 +159,36 @@ class ShochinAnimation {
         this.initTrack();
         this.initAxles();
         this.initBlades();
-        
+
         // アニメーション開始
         this.startScraper();
     }
-    
-    calculateLPerimeter() {
-        const mainTop = this.track.main.width;
-        const mainRight = this.track.main.height; 
-        const mainBottom = this.track.main.width;
-        
-        const extBottom = this.track.extension.width;
-        const extLeft = this.track.extension.height;
-        const extTop = this.track.extension.width - (this.CONFIG.bladeSize/2 + this.CONFIG.borderWidth);
-        
-        const mainLeftTop = this.track.extension.top - this.track.main.top;
-        
-        return mainTop + mainRight + mainBottom + extBottom + extLeft + extTop + mainLeftTop;
+
+    calculateTrapezoidPerimeter() {
+        // 上辺の長さ
+        const topLength = Math.abs(this.track.topRight.x - this.track.topLeft.x);
+
+        // 右辺の長さ
+        const rightLength = Math.abs(this.track.bottomRight.y - this.track.topRight.y);
+
+        // 下辺の長さ
+        const bottomLength = Math.abs(this.track.bottomRight.x - this.track.bottomLeft.x);
+
+        // 左辺（斜辺）の長さ
+        const leftDx = this.track.bottomLeft.x - this.track.topLeft.x;
+        const leftDy = this.track.bottomLeft.y - this.track.topLeft.y;
+        const leftLength = Math.sqrt(leftDx * leftDx + leftDy * leftDy);
+
+        return topLength + rightLength + bottomLength + leftLength;
     }
-    
+
     initBladeStyles() {
         const style = document.createElement('style');
         const size = this.CONFIG.bladeSize;
         const thickness = Math.floor(size / 3);
 
         if (this.reverseDirection) {
-            // 逆回転時の形状：
-            // 上辺（左に進む）：Lの形 = 縦棒左、横棒下
-            // 左辺（下に進む）：」の形 = 縦棒右、横棒下
-            // 下辺（右に進む）：」の形（左右反転） = 縦棒右、横棒上
-            // 右辺（上に進む）：「の形 = 縦棒左、横棒上
+            // 逆回転時の形状
             style.textContent = `
                 .scraper-blade {
                     position: absolute;
@@ -294,10 +272,29 @@ class ShochinAnimation {
                     background: black;
                     left: 0;
                     top: 0;
+                }
+
+                .blade-diagonal::before {
+                    content: '';
+                    position: absolute;
+                    width: ${thickness}px;
+                    height: ${size}px;
+                    background: black;
+                    left: 0;
+                    top: 0;
+                }
+                .blade-diagonal::after {
+                    content: '';
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${thickness}px;
+                    background: black;
+                    left: 0;
+                    bottom: 0;
                 }
             `;
         } else {
-            // 通常：L字の縦棒を右側に
+            // 通常回転
             style.textContent = `
                 .scraper-blade {
                     position: absolute;
@@ -364,7 +361,8 @@ class ShochinAnimation {
                     top: 0;
                 }
 
-                .blade-left::before {
+                .blade-left::before,
+                .blade-diagonal::before {
                     content: '';
                     position: absolute;
                     width: ${thickness}px;
@@ -373,7 +371,8 @@ class ShochinAnimation {
                     right: 0;
                     top: 0;
                 }
-                .blade-left::after {
+                .blade-left::after,
+                .blade-diagonal::after {
                     content: '';
                     position: absolute;
                     width: ${size}px;
@@ -386,229 +385,180 @@ class ShochinAnimation {
         }
         document.head.appendChild(style);
     }
-    
+
     initTrackStyles() {
         const style = document.createElement('style');
         style.textContent = `
-            .scraper-track {
+            .scraper-track-trapezoid {
                 position: absolute;
-                border: ${this.CONFIG.borderWidth}px solid black;
-                background: none;
-                box-sizing: border-box;
-                z-index: 4;
-            }
-
-            .track-main {
-                border-left: none !important;
-            }
-
-            .track-extension {
-                border-right: none !important;
-            }
-
-            .border-partial {
-                position: absolute;
-                border-left: ${this.CONFIG.borderWidth}px solid black;
                 z-index: 4;
             }
         `;
         document.head.appendChild(style);
     }
-    
+
     initAxleStyles() {
         const style = document.createElement('style');
-        const axleSize = this.CONFIG.borderWidth * 3; // 軸の直径
+        const axleSize = this.CONFIG.borderWidth * 5;
         style.textContent = `
             .scraper-axle {
                 position: absolute;
                 width: ${axleSize}px;
                 height: ${axleSize}px;
-                background: #f5f5f5;
-                border-radius: 50%;
-                border: 2px solid #888;
-                z-index: 2;
+                z-index: 5;
+                animation: rotateGear 4s linear infinite;
+            }
+
+            @keyframes rotateGear {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(-360deg);
+                }
             }
         `;
         document.head.appendChild(style);
     }
-    
+
     initTrack() {
         const container = document.getElementById('scraperContainer');
-        
-        const mainTrack = document.createElement('div');
-        mainTrack.className = 'scraper-track track-main';
-        mainTrack.style.cssText = `top: ${this.track.main.top}px; left: ${this.track.main.left}px; width: ${this.track.main.width}px; height: ${this.track.main.height}px;`;
-        container.appendChild(mainTrack);
-        
-        const extTrack = document.createElement('div');
-        extTrack.className = 'scraper-track track-extension';
-        extTrack.style.cssText = `top: ${this.track.extension.top}px; left: ${this.track.extension.left}px; width: ${this.track.extension.width}px; height: ${this.track.extension.height}px;`;
-        container.appendChild(extTrack);
-        
-        const borderPartial = document.createElement('div');
-        borderPartial.className = 'border-partial';
-        borderPartial.style.cssText = `top: ${this.CONFIG.borderPartial.top}px; left: ${this.CONFIG.borderPartial.left}px; width: 0px; height: ${this.CONFIG.borderPartial.height}px;`;
-        container.appendChild(borderPartial);
+
+        // SVGで台形のトラックを描画
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'scraper-track-trapezoid');
+        svg.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;';
+
+        const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        const points = `
+            ${this.track.topLeft.x},${this.track.topLeft.y}
+            ${this.track.topRight.x},${this.track.topRight.y}
+            ${this.track.bottomRight.x},${this.track.bottomRight.y}
+            ${this.track.bottomLeft.x},${this.track.bottomLeft.y}
+        `;
+        polygon.setAttribute('points', points);
+        polygon.setAttribute('fill', 'none');
+        polygon.setAttribute('stroke', 'black');
+        polygon.setAttribute('stroke-width', this.CONFIG.borderWidth);
+
+        svg.appendChild(polygon);
+        container.appendChild(svg);
     }
-    
+
     initAxles() {
         const container = document.getElementById('scraperContainer');
-        const axleSize = this.CONFIG.borderWidth * 3;
+        const axleSize = this.CONFIG.borderWidth * 4;
         const offset = axleSize / 2;
+        const inset = this.CONFIG.borderWidth / 2; // ボーダー幅の半分だけ内側
 
-        // L字型軌道の5つの角の座標（内側に配置 + 微調整）
-        const adjustment = 8; // 微調整のピクセル数
+        // 台形の4つの角に軸を配置（トラックとボーダー内側の中間）
         const axlePositions = [
-            // 1. メイン長方形の左上角（内側） - 下に + 右に
-            {
-                x: this.track.main.left + this.CONFIG.borderWidth - offset + adjustment,
-                y: this.track.main.top + this.CONFIG.borderWidth - offset + adjustment
-            },
-            // 2. メイン長方形の右上角（内側） - 下に + 左に
-            {
-                x: this.track.main.left + this.track.main.width - this.CONFIG.borderWidth - offset - adjustment,
-                y: this.track.main.top + this.CONFIG.borderWidth - offset + adjustment
-            },
-            // 3. メイン長方形の右下角（内側） - 上に + 左に
-            {
-                x: this.track.main.left + this.track.main.width - this.CONFIG.borderWidth - offset - adjustment,
-                y: this.track.main.top + this.track.main.height - this.CONFIG.borderWidth - offset - adjustment
-            },
-            // 4. 突出部分の左下角（内側） - 上に + 右に
-            {
-                x: this.track.extension.left + this.CONFIG.borderWidth - offset + adjustment,
-                y: this.track.extension.top + this.track.extension.height - this.CONFIG.borderWidth - offset - adjustment
-            },
-            // 5. 突出部分の左上角（内側） - 下に + 右に
-            {
-                x: this.track.extension.left + this.CONFIG.borderWidth - offset + adjustment,
-                y: this.track.extension.top + this.CONFIG.borderWidth - offset + adjustment
-            },
-            // 6. メインと突出の接点の上の角（90度側）- 外側配置 + さらに左に
-            {
-                x: this.track.main.left - this.CONFIG.borderWidth - offset,
-                y: this.track.extension.top - this.CONFIG.borderWidth - offset
-            }
+            { x: this.track.topLeft.x - offset + inset, y: this.track.topLeft.y - offset + inset },           // 左上
+            { x: this.track.topRight.x - offset*2 - inset, y: this.track.topRight.y - offset + inset },         // 右上
+            { x: this.track.bottomRight.x - offset*2 - inset, y: this.track.bottomRight.y - offset*1.5 - inset },   // 右下
+            { x: this.track.bottomLeft.x + inset, y: this.track.bottomLeft.y - offset*1.5 - inset }      // 左下
         ];
 
         axlePositions.forEach((pos, index) => {
-            const axle = document.createElement('div');
+            const axle = document.createElement('img');
+            axle.src = '../../material/gear.svg';
             axle.className = 'scraper-axle';
-            axle.id = `axle-${index + 1}`; // 管理用ID
+            axle.id = `axle-${index + 1}`;
+            axle.alt = '歯車';
             axle.style.left = pos.x + 'px';
             axle.style.top = pos.y + 'px';
             container.appendChild(axle);
         });
     }
-    
+
     initBlades() {
         const container = document.getElementById('scraperContainer');
-        
+
         this.blades.forEach(blade => {
             if (blade.element && blade.element.parentNode) {
                 blade.element.parentNode.removeChild(blade.element);
             }
         });
         this.blades = [];
-        
+
         for (let i = 0; i < this.bladeCount; i++) {
             const blade = document.createElement('div');
             blade.className = 'scraper-blade blade-top';
             container.appendChild(blade);
-            
+
             const position = (i * this.CONFIG.bladeSpacing) % this.perimeter;
-            
+
             this.blades.push({
                 element: blade,
                 position: position
             });
         }
-        
+
         this.updateBlades();
     }
-    
+
     getBladeTransform(position) {
         const normalizedPos = position % this.perimeter;
         let cumulativeLength = 0;
-        let x, y, direction;
+        let x, y, direction, angle;
 
-        // 1. メイン長方形の上辺
-        const seg1 = this.track.main.width;
-        if (normalizedPos < cumulativeLength + seg1) {
+        // 1. 上辺（左から右へ）
+        const topLength = this.track.topRight.x - this.track.topLeft.x;
+        if (normalizedPos < cumulativeLength + topLength) {
             const localPos = normalizedPos - cumulativeLength;
-            x = this.track.main.left + localPos - this.CONFIG.bladeSize/2;
-            y = this.track.main.top - this.CONFIG.bladeSize;
+            x = this.track.topLeft.x + localPos - this.CONFIG.bladeSize/2;
+            y = this.track.topLeft.y - this.CONFIG.bladeSize;
             direction = 'top';
-            return { x, y, direction };
+            angle = 0;
+            return { x, y, direction, angle };
         }
-        cumulativeLength += seg1;
+        cumulativeLength += topLength;
 
-        // 2. メイン長方形の右辺
-        const seg2 = this.track.main.height;
-        if (normalizedPos < cumulativeLength + seg2) {
+        // 2. 右辺（上から下へ）
+        const rightLength = this.track.bottomRight.y - this.track.topRight.y;
+        if (normalizedPos < cumulativeLength + rightLength) {
             const localPos = normalizedPos - cumulativeLength;
-            x = this.track.main.left + this.track.main.width;
-            y = this.track.main.top + localPos - this.CONFIG.bladeSize/2;
+            x = this.track.topRight.x;
+            y = this.track.topRight.y + localPos - this.CONFIG.bladeSize/2;
             direction = 'right';
-            return { x, y, direction };
+            angle = 0;
+            return { x, y, direction, angle };
         }
-        cumulativeLength += seg2;
+        cumulativeLength += rightLength;
 
-        // 3. メイン長方形の下辺
-        const seg3 = this.track.main.width;
-        if (normalizedPos < cumulativeLength + seg3) {
+        // 3. 下辺（右から左へ）
+        const bottomLength = this.track.bottomRight.x - this.track.bottomLeft.x;
+        if (normalizedPos < cumulativeLength + bottomLength) {
             const localPos = normalizedPos - cumulativeLength;
-            x = this.track.main.left + this.track.main.width - localPos - this.CONFIG.bladeSize/2;
-            y = this.track.main.top + this.track.main.height;
+            x = this.track.bottomRight.x - localPos - this.CONFIG.bladeSize/2;
+            y = this.track.bottomRight.y;
             direction = 'bottom';
-            return { x, y, direction };
+            angle = 0;
+            return { x, y, direction, angle };
         }
-        cumulativeLength += seg3;
+        cumulativeLength += bottomLength;
 
-        // 4. 突出部分の下辺
-        const seg4 = this.track.extension.width;
-        if (normalizedPos < cumulativeLength + seg4) {
-            const localPos = normalizedPos - cumulativeLength;
-            x = this.track.main.left - localPos - this.CONFIG.bladeSize/2;
-            y = this.track.extension.top + this.track.extension.height;
-            direction = 'bottom';
-            return { x, y, direction };
-        }
-        cumulativeLength += seg4;
+        // 4. 左辺（斜辺：下から上へ）
+        const leftDx = this.track.topLeft.x - this.track.bottomLeft.x;
+        const leftDy = this.track.topLeft.y - this.track.bottomLeft.y;
+        const leftLength = Math.sqrt(leftDx * leftDx + leftDy * leftDy);
 
-        // 5. 突出部分の左辺
-        const seg5 = this.track.extension.height;
-        if (normalizedPos < cumulativeLength + seg5) {
-            const localPos = normalizedPos - cumulativeLength;
-            x = this.track.extension.left - this.CONFIG.bladeSize;
-            y = this.track.extension.top + this.track.extension.height - localPos - this.CONFIG.bladeSize/2;
-            direction = 'left';
-            return { x, y, direction };
-        }
-        cumulativeLength += seg5;
-
-        // 6. 突出部分の上辺
-        const seg6 = this.track.extension.width - (this.CONFIG.bladeSize/2 + this.CONFIG.borderWidth);
-        if (normalizedPos < cumulativeLength + seg6) {
-            const localPos = normalizedPos - cumulativeLength;
-            x = this.track.extension.left + localPos - this.CONFIG.bladeSize/2;
-            y = this.track.extension.top - this.CONFIG.bladeSize;
-            direction = 'top';
-            return { x, y, direction };
-        }
-        cumulativeLength += seg6;
-
-        // 7. メイン長方形の左辺上部
-        const seg7 = this.track.extension.top - this.track.main.top;
         const localPos = normalizedPos - cumulativeLength;
-        x = this.track.main.left - this.CONFIG.bladeSize;
-        y = this.track.extension.top - localPos - this.CONFIG.bladeSize/2;
-        direction = 'left';
+        const ratio = localPos / leftLength;
 
-        return { x, y, direction };
+        // 斜辺の角度を計算（ラジアンから度に変換）
+        angle = Math.atan2(leftDy, leftDx) * (180 / Math.PI);
+
+        // ブレードの底辺がトラックに密着するように位置調整
+        // トラックの太さの半分だけ左上に移動
+        x = this.track.bottomLeft.x + leftDx * ratio - this.CONFIG.bladeSize - this.CONFIG.borderWidth / 2;
+        y = this.track.bottomLeft.y + leftDy * ratio - this.CONFIG.bladeSize/2 - this.CONFIG.borderWidth / 2;
+        direction = 'diagonal';
+
+        return { x, y, direction, angle };
     }
-    
-    updateBlades() {
+
+    updateBlades(deltaFactor = 1) {
         this.blades.forEach(blade => {
             const transform = this.getBladeTransform(blade.position);
 
@@ -616,27 +566,43 @@ class ShochinAnimation {
             blade.element.style.top = transform.y + 'px';
             blade.element.className = `scraper-blade blade-${transform.direction}`;
 
-            if (this.reverseDirection) {
-                blade.position = (blade.position - this.CONFIG.speed + this.perimeter) % this.perimeter;
+            // 斜辺では角度をつける
+            if (transform.angle !== 0) {
+                blade.element.style.transform = `rotate(${transform.angle}deg)`;
+                blade.element.style.transformOrigin = 'center center';
             } else {
-                blade.position = (blade.position + this.CONFIG.speed) % this.perimeter;
+                blade.element.style.transform = '';
+            }
+
+            if (this.reverseDirection) {
+                blade.position = (blade.position - this.CONFIG.speed * deltaFactor + this.perimeter) % this.perimeter;
+            } else {
+                blade.position = (blade.position + this.CONFIG.speed * deltaFactor) % this.perimeter;
             }
         });
     }
-    
+
     startScraper() {
         if (this.animationId) return;
-        
+
         const animate = () => {
             if (!this.isPaused) {
-                this.updateBlades();
+                const currentTime = performance.now();
+                const deltaTime = (currentTime - this.lastTime) / 1000; // 秒単位
+                this.lastTime = currentTime;
+
+                // 60fpsを基準とした係数
+                const deltaFactor = deltaTime * 60;
+
+                this.updateBlades(deltaFactor);
             }
             this.animationId = requestAnimationFrame(animate);
         };
-        
+
+        this.lastTime = performance.now(); // 開始時刻をリセット
         animate();
     }
-    
+
     stopScraper() {
         if (this.animationId) {
             cancelAnimationFrame(this.animationId);
@@ -646,7 +612,6 @@ class ShochinAnimation {
 }
 
 // DOM読み込み完了後にアニメーション開始
-// デフォルトの初期化（HTMLから上書き可能）
 if (typeof window.scraperConfig === 'undefined') {
     document.addEventListener('DOMContentLoaded', () => {
         new ShochinAnimation();
@@ -656,6 +621,6 @@ if (typeof window.scraperConfig === 'undefined') {
 // パフォーマンス監視
 if ('requestIdleCallback' in window) {
     requestIdleCallback(() => {
-        console.log('アニメーション最適化完了');
+        console.log('アニメーション最適化完了（台形版）');
     });
 }
