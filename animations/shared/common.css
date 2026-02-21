@@ -265,26 +265,74 @@ body {
   color: #ffffff;
   margin: 0;
   padding: 0 20px;
-  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+  transition: opacity 0.5s ease-in-out;
   text-shadow: 0 1px 4px rgba(0,0,0,0.2);
   text-align: center;
   opacity: 1;
-  transform: translateY(0);
 }
 
 .caption.fade-out {
   opacity: 0;
-  transform: translateY(-20px);
 }
 
 .caption.fade-in {
   opacity: 1;
-  transform: translateY(0);
 }
 
 .caption.fade-in-start {
   opacity: 0;
-  transform: translateY(20px);
+}
+
+/* ドットインジケーター */
+.caption-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.caption-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.caption-dot.active {
+  background: rgba(255, 255, 255, 0.95);
+  transform: scale(1.2);
+}
+
+/* 一時停止インジケーター */
+.pause-indicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  display: flex;
+  gap: 8px;
+  padding: 20px 24px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.pause-indicator span {
+  width: 8px;
+  height: 32px;
+  background: white;
+  border-radius: 2px;
+}
+
+.pause-indicator.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
 }
 
 
