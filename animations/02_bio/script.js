@@ -102,8 +102,12 @@ class BioReactionAnimation {
                 // 外周のどの辺りを通るか（0=内側寄り、1=外側寄り）
                 this.pathOffset = Math.random();
 
-                // 泡のサイズ
-                this.r = CFG.baseSize + Math.random() * CFG.sizeVariation;
+                // 泡のサイズ（0〜1の正規化値を保持）
+                const sizeRatio = Math.random();
+                this.r = CFG.baseSize + sizeRatio * CFG.sizeVariation;
+
+                // 上昇速度は泡のサイズに比例（大きい泡＝浮力大＝速い）
+                this.risingSpeedMultiplier = 1.2 + sizeRatio * 0.4;  // 1.2〜1.6倍
 
                 // 揺らぎ用シード
                 this.wobbleSeed = Math.random() * 1000;
@@ -121,8 +125,12 @@ class BioReactionAnimation {
                 const W = canvas.width / dpr;
                 const H = canvas.height / dpr;
 
+                // 上昇フェーズ（Phase1）は速く、サイズに比例した速度
+                const isRisingPhase = this.progress < 0.30;
+                const speedMultiplier = isRisingPhase ? this.risingSpeedMultiplier : 1.0;
+
                 // 進行度を更新
-                this.progress += this.speed * dt;
+                this.progress += this.speed * dt * speedMultiplier;
 
                 // 軌道の各区間の長さ（比率）
                 // Phase1: 右辺上昇, Corner1: 右上角カーブ, Phase2: 上辺左移動, Corner2: 左上角カーブ, Phase3: 左辺下降
