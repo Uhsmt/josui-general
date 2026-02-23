@@ -1,121 +1,126 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>下水道システム - 最終沈殿池</title>
-    <link rel="stylesheet" href="../shared/common.css">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="../shared/common.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <a href="../../index.html" class="back-button">メニュー</a>
 
     <!-- アニメーションエリア（最上部） -->
     <div class="animation-section">
-        <div class="animation-area">
-            <div class="animation-container-wrapper">
-                <!-- ベース画像 -->
-                <img src="../../material/03_base_v2.svg" alt="最終沈殿池ベース" class="base-image">
+      <div class="animation-area">
+        <div class="animation-container-wrapper">
+          <!-- ベース画像 -->
+          <img src="../../material/03_base_v2.svg" alt="最終沈殿池ベース" class="base-image" />
 
-                <!-- スイスイくんアニメーション-->
-                <div class="suisui-container" id="suisuiContainer">
-                    <div id="suisui-area"></div>
-                </div>
+          <!-- スイスイくんアニメーション-->
+          <div class="suisui-container" id="suisuiContainer">
+            <div id="suisui-area"></div>
+          </div>
 
-                <!-- 砂利アニメーションレイヤー -->
-                <div class="gravel-animation-layer">
-                    <div class="gravel-area" id="gravel-area-1"></div>
-                    <div class="gravel-area" id="gravel-area-2"></div>
-                    <div class="gravel-area" id="gravel-area-3"></div>
-                    <div class="gravel-area" id="gravel-area-4"></div>
-                </div>
+          <!-- 砂利アニメーションレイヤー -->
+          <div class="gravel-animation-layer">
+            <div class="gravel-area" id="gravel-area-1"></div>
+            <div class="gravel-area" id="gravel-area-2"></div>
+            <div class="gravel-area" id="gravel-area-3"></div>
+            <div class="gravel-area" id="gravel-area-4"></div>
+          </div>
 
-                <!-- スクレーパーアニメーション用コンテナ -->
-                <div class="scraper-container" id="scraperContainer">
-                    <!-- 台形のトラックとブレード（動的に生成される） -->
-                </div>
+          <!-- スクレーパーアニメーション用コンテナ -->
+          <div class="scraper-container" id="scraperContainer">
+            <!-- 台形のトラックとブレード（動的に生成される） -->
+          </div>
 
-                <!-- 説明用レイヤー -->
-                <div class="explanation-layer">
-                    <!-- 吹き出し -->
-                    <div class="explanation-bubble " id="bubble-1">消毒・放流</div>
-                    <div class="explanation-bubble " id="bubble-2">汚泥処理施設へ</div>
-                    <div class="explanation-bubble " id="bubble-3">反応槽から</div>
-                    <div class="explanation-bubble " id="bubble-4">生物反応槽へ<br>(返送汚泥)</div>
-                    <div class="explanation-bubble " id="bubble-5">汚泥処理施設へ</div>
-                    <!-- 矢印 -->
-                    <img src="../../material/allow_left_long.svg" class="arrow" id="arrow-1" alt="上矢印">
-                    <img src="../../material/allow_top.svg" class="arrow" id="arrow-2" alt="上矢印">
-                    <img src="../../material/allow_left_long.svg" class="arrow" id="arrow-3" alt="左矢印長">
-                </div>
+          <!-- 説明用レイヤー -->
+          <div class="explanation-layer">
+            <!-- 吹き出し -->
+            <div class="explanation-bubble" id="bubble-1">消毒・放流</div>
+            <div class="explanation-bubble" id="bubble-2">汚泥処理施設へ</div>
+            <div class="explanation-bubble" id="bubble-3">反応槽から</div>
+            <div class="explanation-bubble" id="bubble-4">生物反応槽へ<br />(返送汚泥)</div>
+            <div class="explanation-bubble" id="bubble-5">汚泥処理施設へ</div>
+            <!-- 矢印 -->
+            <img src="../../material/allow_left_long.svg" class="arrow" id="arrow-1" alt="上矢印" />
+            <img src="../../material/allow_top.svg" class="arrow" id="arrow-2" alt="上矢印" />
+            <img
+              src="../../material/allow_left_long.svg"
+              class="arrow"
+              id="arrow-3"
+              alt="左矢印長"
+            />
+          </div>
 
-                <!-- ハイライトエリア（説明文に連動して表示） -->
-                <div class="highlight-layer" id="highlightLayer"></div>
+          <!-- ハイライトエリア（説明文に連動して表示） -->
+          <div class="highlight-layer" id="highlightLayer"></div>
 
-                <!-- scum skimmer -->
-                <div class="scum-skimmer-container">
-                    <img src="../../material/scum_skimmer.svg" alt="スカムスキマー" class="scum-skimmer">
-                </div>
-            </div>
+          <!-- scum skimmer -->
+          <div class="scum-skimmer-container">
+            <img src="../../material/scum_skimmer.svg" alt="スカムスキマー" class="scum-skimmer" />
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- 説明エリア（下部固定） -->
     <div class="description-section">
-        <h1 class="title">最終沈殿池</h1>
-        <div class="caption-area">
-            <p class="caption" id="captionText">
-                生物反応槽で増えた微生物（活性汚泥）を沈めます。水は透明になります。
-            </p>
-        </div>
+      <h1 class="title">最終沈殿池</h1>
+      <div class="caption-area">
+        <p class="caption" id="captionText">
+          生物反応槽で増えた微生物（活性汚泥）を沈めます。水は透明になります。
+        </p>
+      </div>
     </div>
 
     <script src="script.js"></script>
     <script>
-        window.scraperConfig = { reverse: true };
+      window.scraperConfig = { reverse: true };
     </script>
     <script src="../shared/gravel.js"></script>
     <script src="../shared/scraper.js"></script>
     <script src="../shared/caption-controller.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            new ShochinAnimation(window.scraperConfig);
+      document.addEventListener('DOMContentLoaded', () => {
+        new ShochinAnimation(window.scraperConfig);
 
-            // 説明文のデータ（後で追加予定）
-            const captions = [
-                {
-                    text: 'これは、最終沈殿池を横から見た様子です。',
-                    highlight: null
-                },
-                {
-                    text: 'ゆっくり流して活性汚泥を沈ませて行きます。',
-                    highlight: { top: '35%', left: '72%', width: '23%', height: '25%' }
-                },
-                {
-                    text: '沈んだ汚泥は、汚泥処理施設に送ります。',
-                    highlight: { top: '80%', left: '60%', width: '25%', height: '15%' }
-                },
-                {
-                    text: '水に浮く汚泥も、取り除いていきます。',
-                    highlight: { top: '-3%', left: '29%', width: '30%', height: '16%' }
-                },
-                {
-                    text: '汚泥を集めるため、掻き寄せ機が回っています',
-                    highlight: { top: '50%', left: '15%', width: '40%', height: '10%' }
-                },
-                {
-                    text: '砂ろ過して、放流します。',
-                    highlight: { top: '6%', left: '-7%', width: '20%', height: '15%' }
-                },
-                {
-                    text: '',
-                    highlight: null
-                }
-            ];
+        // 説明文のデータ（後で追加予定）
+        const captions = [
+          {
+            text: 'これは、最終沈殿池を横から見た様子です。',
+            highlight: null,
+          },
+          {
+            text: 'ゆっくり流して活性汚泥を沈ませて行きます。',
+            highlight: { top: '35%', left: '72%', width: '23%', height: '25%' },
+          },
+          {
+            text: '沈んだ汚泥は、汚泥処理施設に送ります。',
+            highlight: { top: '80%', left: '60%', width: '25%', height: '15%' },
+          },
+          {
+            text: '水に浮く汚泥も、取り除いていきます。',
+            highlight: { top: '-3%', left: '29%', width: '30%', height: '16%' },
+          },
+          {
+            text: '汚泥を集めるため、掻き寄せ機が回っています',
+            highlight: { top: '50%', left: '15%', width: '40%', height: '10%' },
+          },
+          {
+            text: '砂ろ過して、放流します。',
+            highlight: { top: '6%', left: '-7%', width: '20%', height: '15%' },
+          },
+          {
+            text: '',
+            highlight: null,
+          },
+        ];
 
-            // キャプションコントローラーを初期化（8秒ごとに切り替え）
-            new CaptionController(captions, 8000);
-        });
+        // キャプションコントローラーを初期化（8秒ごとに切り替え）
+        new CaptionController(captions, 8000);
+      });
     </script>
-</body>
+  </body>
 </html>

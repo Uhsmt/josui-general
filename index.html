@@ -1,224 +1,220 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>下水道システムアニメーション</title>
-    <link rel="stylesheet" href="animations/shared/common.css">
+    <link rel="stylesheet" href="animations/shared/common.css" />
     <style>
+      .nav-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        gap: 32px;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      }
+
+      /* 共通の幅を持つコンテナ */
+      .content-wrapper {
+        max-width: 720px;
+        width: 100%;
+      }
+
+      .main-title {
+        font-size: clamp(28px, 5vw, 48px);
+        font-weight: 700;
+        text-align: center;
+        color: #2c3e50;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      /* ナビリンク */
+      .nav-links {
+        display: flex;
+        gap: 16px;
+      }
+
+      .nav-link {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px 16px;
+        background: linear-gradient(135deg, #17a589 0%, #138d75 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-size: clamp(14px, 2vw, 18px);
+        font-weight: 600;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .nav-link.v2 {
+        background: linear-gradient(135deg, #0e3d3d 0%, #17a589 100%);
+      }
+
+      .nav-link:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+      }
+
+      .nav-link:active {
+        transform: translateY(0);
+      }
+
+      /* 操作方法セクション */
+      .controls-section {
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 12px;
+        padding: 20px 24px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      }
+
+      .controls-title {
+        font-size: clamp(12px, 1.5vw, 14px);
+        font-weight: 600;
+        color: #888;
+        text-align: center;
+        margin-bottom: 16px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+
+      .controls-grid {
+        display: flex;
+        justify-content: center;
+        gap: 32px;
+      }
+
+      .control-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .key-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 52px;
+        height: 52px;
+        background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
+        border: 2px solid #d0d0d0;
+        border-radius: 10px;
+        box-shadow:
+          0 4px 0 #c0c0c0,
+          0 6px 8px rgba(0, 0, 0, 0.1);
+        font-size: 18px;
+        font-weight: 600;
+        color: #444;
+        transition: all 0.15s ease;
+        line-height: 1;
+      }
+
+      .key-icon:hover {
+        transform: translateY(2px);
+        box-shadow:
+          0 2px 0 #c0c0c0,
+          0 3px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .key-icon.wide {
+        width: 72px;
+        font-size: 13px;
+      }
+
+      .key-icon .arrow-text {
+        font-size: 24px;
+        line-height: 1;
+      }
+
+      .control-label {
+        font-size: 12px;
+        color: #666;
+        text-align: center;
+        font-weight: 500;
+      }
+
+      /* レスポンシブ */
+      @media (max-width: 600px) {
         .nav-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            gap: 32px;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+          gap: 24px;
+          padding: 30px 16px;
         }
 
-        /* 共通の幅を持つコンテナ */
-        .content-wrapper {
-            max-width: 720px;
-            width: 100%;
-        }
-
-        .main-title {
-            font-size: clamp(28px, 5vw, 48px);
-            font-weight: 700;
-            text-align: center;
-            color: #2c3e50;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        /* ナビリンク */
         .nav-links {
-            display: flex;
-            gap: 16px;
+          flex-direction: column;
+          gap: 12px;
         }
 
         .nav-link {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px 16px;
-            background: linear-gradient(135deg, #17a589 0%, #138d75 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 12px;
-            font-size: clamp(14px, 2vw, 18px);
-            font-weight: 600;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+          padding: 16px;
         }
 
-        .nav-link.v2 {
-            background: linear-gradient(135deg, #0e3d3d 0%, #17a589 100%);
-        }
-
-        .nav-link:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-        }
-
-        .nav-link:active {
-            transform: translateY(0);
-        }
-
-        /* 操作方法セクション */
         .controls-section {
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 12px;
-            padding: 20px 24px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        }
-
-        .controls-title {
-            font-size: clamp(12px, 1.5vw, 14px);
-            font-weight: 600;
-            color: #888;
-            text-align: center;
-            margin-bottom: 16px;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
+          padding: 16px 20px;
         }
 
         .controls-grid {
-            display: flex;
-            justify-content: center;
-            gap: 32px;
-        }
-
-        .control-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
+          gap: 20px;
         }
 
         .key-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 52px;
-            height: 52px;
-            background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
-            border: 2px solid #d0d0d0;
-            border-radius: 10px;
-            box-shadow:
-                0 4px 0 #c0c0c0,
-                0 6px 8px rgba(0,0,0,0.1);
-            font-size: 18px;
-            font-weight: 600;
-            color: #444;
-            transition: all 0.15s ease;
-            line-height: 1;
-        }
-
-        .key-icon:hover {
-            transform: translateY(2px);
-            box-shadow:
-                0 2px 0 #c0c0c0,
-                0 3px 4px rgba(0,0,0,0.1);
+          width: 44px;
+          height: 44px;
+          font-size: 16px;
         }
 
         .key-icon.wide {
-            width: 72px;
-            font-size: 13px;
+          width: 60px;
+          font-size: 11px;
         }
 
         .key-icon .arrow-text {
-            font-size: 24px;
-            line-height: 1;
+          font-size: 20px;
         }
 
         .control-label {
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-            font-weight: 500;
+          font-size: 11px;
         }
-
-        /* レスポンシブ */
-        @media (max-width: 600px) {
-            .nav-container {
-                gap: 24px;
-                padding: 30px 16px;
-            }
-
-            .nav-links {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .nav-link {
-                padding: 16px;
-            }
-
-            .controls-section {
-                padding: 16px 20px;
-            }
-
-            .controls-grid {
-                gap: 20px;
-            }
-
-            .key-icon {
-                width: 44px;
-                height: 44px;
-                font-size: 16px;
-            }
-
-            .key-icon.wide {
-                width: 60px;
-                font-size: 11px;
-            }
-
-            .key-icon .arrow-text {
-                font-size: 20px;
-            }
-
-            .control-label {
-                font-size: 11px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="nav-container">
-        <h1 class="main-title content-wrapper">下水道システムアニメーション</h1>
+      <h1 class="main-title content-wrapper">下水道システムアニメーション</h1>
 
-        <div class="nav-links content-wrapper">
-            <a href="animations/01_shochin/index.html" class="nav-link">
-                01. 最初沈殿池
-            </a>
-            <a href="animations/02_bio/index.html" class="nav-link">
-                02. 生物反応槽
-            </a>
-            <a href="animations/03_final/index.html" class="nav-link">
-                03. 最終沈殿池
-            </a>
-        </div>
+      <div class="nav-links content-wrapper">
+        <a href="animations/01_shochin/index.html" class="nav-link"> 01. 最初沈殿池 </a>
+        <a href="animations/02_bio/index.html" class="nav-link"> 02. 生物反応槽 </a>
+        <a href="animations/03_final/index.html" class="nav-link"> 03. 最終沈殿池 </a>
+      </div>
 
-        <div class="controls-section content-wrapper">
-            <div class="controls-title">操作方法</div>
-            <div class="controls-grid">
-                <div class="control-item">
-                    <div class="key-icon wide">Space</div>
-                    <div class="control-label">一時停止 / 再開</div>
-                </div>
-                <div class="control-item">
-                    <div class="key-icon"><span class="arrow-text">←</span></div>
-                    <div class="control-label">前の説明へ</div>
-                </div>
-                <div class="control-item">
-                    <div class="key-icon"><span class="arrow-text">→</span></div>
-                    <div class="control-label">次の説明へ</div>
-                </div>
-            </div>
+      <div class="controls-section content-wrapper">
+        <div class="controls-title">操作方法</div>
+        <div class="controls-grid">
+          <div class="control-item">
+            <div class="key-icon wide">Space</div>
+            <div class="control-label">一時停止 / 再開</div>
+          </div>
+          <div class="control-item">
+            <div class="key-icon"><span class="arrow-text">←</span></div>
+            <div class="control-label">前の説明へ</div>
+          </div>
+          <div class="control-item">
+            <div class="key-icon"><span class="arrow-text">→</span></div>
+            <div class="control-label">次の説明へ</div>
+          </div>
         </div>
+      </div>
     </div>
-</body>
+  </body>
 </html>

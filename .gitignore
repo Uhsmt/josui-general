@@ -1,2 +1,4 @@
 .DS_Store
 materials-archive/
+node_modules/
+.claude/

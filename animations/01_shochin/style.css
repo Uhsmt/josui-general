@@ -1,64 +1,64 @@
 /* 吹き出しと矢印の位置（1000x750基準） */
 #bubble-biological {
-    top: 12%;
-    left: 2%;
+  top: 12%;
+  left: 2%;
 }
 
 #bubble-sludge-treatment1 {
-    top: -2%;
-    left: 41%;
+  top: -2%;
+  left: 41%;
 }
 
 #bubble-inflow {
-    top: 12%;
-    left: 97%;
+  top: 12%;
+  left: 97%;
 }
 
 #bubble-sludge-treatment2 {
-    top: 85%;
-    left: 95%;
+  top: 85%;
+  left: 95%;
 }
 
 #arrow-1 {
-    top: 7%;
-    left: 2%;
+  top: 7%;
+  left: 2%;
 }
 
 #arrow-2 {
-    top: -2%;
-    left: 31%;
+  top: -2%;
+  left: 31%;
 }
 
 #arrow-3 {
-    top: 7%;
-    left: 97%;
+  top: 7%;
+  left: 97%;
 }
 
 /* Scum Skimmer */
 .scum-skimmer-container {
-    position: absolute;
-    top: 2%;
-    left: 29%;
-    width: 6%;
-    height: 12%;
-    z-index: 5;
+  position: absolute;
+  top: 2%;
+  left: 29%;
+  width: 6%;
+  height: 12%;
+  z-index: 5;
 }
 
 .scum-skimmer {
-    width: 100%;
-    height: 100%;
-    transform-origin: center center;
-    animation: skimmer-tilt 6s ease-in-out infinite;
+  width: 100%;
+  height: 100%;
+  transform-origin: center center;
+  animation: skimmer-tilt 6s ease-in-out infinite;
 }
 
 @keyframes skimmer-tilt {
-    0% {
-        transform: rotate(0deg);
-    }
-    50% {
-        transform: rotate(-90deg);
-    }
-    100% {
-        transform: rotate(0deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-90deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
 }
