@@ -7,8 +7,8 @@ class SuisuiAnimation {
 
         // 魚の種類と数
         const fishTypes = [
-            { name: 'suisui1', count: 2 },
-            { name: 'suisui2', count: 2 }
+            { name: 'fish1', count: 2 },
+            { name: 'fish2', count: 2 }
         ];
 
         // 各魚を生成
