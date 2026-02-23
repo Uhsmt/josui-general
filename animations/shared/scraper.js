@@ -3,12 +3,10 @@ class ShochinAnimation {
     constructor(options = {}) {
         this.animationId = null;
         this.blades = [];
-        this.isPaused = false;
         this.reverseDirection = options.reverse || false;
         this.lastTime = performance.now(); // 時間管理用
 
         this.init();
-        this.setupControls();
         this.initScraper();
     }
 
@@ -64,28 +62,6 @@ class ShochinAnimation {
     exitFullscreen() {
         if (document.fullscreenElement) {
             document.exitFullscreen();
-        }
-    }
-
-    setupControls() {
-        // スペースキーでアニメーション一時停止/再開
-        document.addEventListener('keydown', (event) => {
-            if (event.key === ' ') {
-                event.preventDefault();
-                this.toggleAnimation();
-            }
-        });
-    }
-
-    toggleAnimation() {
-        if (this.isPaused) {
-            this.startScraper();
-            this.isPaused = false;
-            console.log('アニメーション再開');
-        } else {
-            this.stopScraper();
-            this.isPaused = true;
-            console.log('アニメーション一時停止');
         }
     }
 
@@ -586,16 +562,14 @@ class ShochinAnimation {
         if (this.animationId) return;
 
         const animate = () => {
-            if (!this.isPaused) {
-                const currentTime = performance.now();
-                const deltaTime = (currentTime - this.lastTime) / 1000; // 秒単位
-                this.lastTime = currentTime;
+            const currentTime = performance.now();
+            const deltaTime = (currentTime - this.lastTime) / 1000; // 秒単位
+            this.lastTime = currentTime;
 
-                // 60fpsを基準とした係数
-                const deltaFactor = deltaTime * 60;
+            // 60fpsを基準とした係数
+            const deltaFactor = deltaTime * 60;
 
-                this.updateBlades(deltaFactor);
-            }
+            this.updateBlades(deltaFactor);
             this.animationId = requestAnimationFrame(animate);
         };
 
