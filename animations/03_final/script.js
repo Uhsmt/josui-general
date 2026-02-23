@@ -38,11 +38,11 @@ class SuisuiAnimation {
             element: fishImg,
             x: Math.random() * (this.container.offsetWidth - 40),
             y: Math.random() * (this.container.offsetHeight - 40),
-            vx: (Math.random() - 0.5) * 1.4,  // 2 * 0.7
-            vy: (Math.random() - 0.5) * 1.4,  // 2 * 0.7
-            speed: 0.7 + Math.random() * 0.7,  // (1~2) * 0.7
+            vx: (Math.random() - 0.5) * 0.7,  // 2 * 0.35
+            vy: (Math.random() - 0.5) * 0.7,  // 2 * 0.35
+            speed: 0.35 + Math.random() * 0.35,  // (1~2) * 0.35
             wobblePhase: Math.random() * Math.PI * 2,
-            wobbleSpeed: 0.014 + Math.random() * 0.014  // (0.02 + 0.02) * 0.7
+            wobbleSpeed: 0.007 + Math.random() * 0.007  // (0.02 + 0.02) * 0.35
         };
 
         this.fishes.push(fish);
@@ -82,14 +82,14 @@ class SuisuiAnimation {
 
             // ランダムに方向を微調整（ふらふら感を出す）
             if (Math.random() < 0.02) {
-                fish.vx += (Math.random() - 0.5) * 0.35;  // 0.5 * 0.7
-                fish.vy += (Math.random() - 0.5) * 0.35;  // 0.5 * 0.7
+                fish.vx += (Math.random() - 0.5) * 0.175;  // 0.5 * 0.35
+                fish.vy += (Math.random() - 0.5) * 0.175;  // 0.5 * 0.35
 
                 // 速度を制限
                 const currentSpeed = Math.sqrt(fish.vx * fish.vx + fish.vy * fish.vy);
-                if (currentSpeed > 1.4) {  // 2 * 0.7
-                    fish.vx = (fish.vx / currentSpeed) * 1.4;
-                    fish.vy = (fish.vy / currentSpeed) * 1.4;
+                if (currentSpeed > 0.7) {  // 2 * 0.35
+                    fish.vx = (fish.vx / currentSpeed) * 0.7;
+                    fish.vy = (fish.vy / currentSpeed) * 0.7;
                 }
             }
 

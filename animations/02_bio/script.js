@@ -5,47 +5,10 @@ class BioReactionAnimation {
     }
 
     init() {
-        // 渦アニメーションの初期化
-        this.initVortexAnimations();
-
         // 気泡アニメーションの初期化
         this.initBubbleAnimations();
     }
-    
-    initVortexAnimations() {
-        // 無酸素槽の渦を生成（縦幅1.5倍）
-        this.createVortexPath('vortex-path-1', 100, 50, 350, 80, 15, 12);
-        
-        // 嫌気槽の渦を生成（縦幅1.5倍）
-        this.createVortexPath('vortex-path-2', 100, 50, 350, 80, 15, 12);
-    }
-    
-    createVortexPath(pathId, cx, topY, bottomY, rTop, rBottom, turns) {
-        const pathEl = document.getElementById(pathId);
-        if (!pathEl) return;
-        
-        const pointsPerTurn = 60;
-        const totalPoints = Math.max(50, Math.floor(pointsPerTurn * turns));
-        const ySpan = bottomY - topY;
-        
-        let d = "";
-        for (let i = 0; i <= totalPoints; i++) {
-            const t = i / totalPoints;
-            const y = topY + ySpan * t;
-            const radius = rTop + (rBottom - rTop) * t;
-            const theta = (turns * 2 * Math.PI) * t;
-            const x = cx + Math.cos(theta) * radius;
-            
-            if (i === 0) {
-                d += `M ${x.toFixed(2)} ${y.toFixed(2)}`;
-            } else {
-                d += ` L ${x.toFixed(2)} ${y.toFixed(2)}`;
-            }
-        }
-        
-        pathEl.setAttribute("d", d);
-    }
-    
+
     initBubbleAnimations() {
         // 気泡アニメーション1を初期化
         this.createBubbleAnimation('bubble-canvas-1');
@@ -78,12 +41,12 @@ class BioReactionAnimation {
             marginTop: 0.05,
             marginBottom: 0.05,
             marginLeft: 0.05,
-            marginRight: 0.10,
+            marginRight: 0.05,
             // 内側空白エリア（中央の空白部分）
             innerTop: 0.25,
             innerBottom: 0.01,
             innerLeft: 0.20,
-            innerRight: 0.20
+            innerRight: 0.10
         };
 
         class Bubble {

@@ -1,46 +1,30 @@
 /* 各吹き出しの位置設定 */
-#bubble-aerobic { top: 90%; left: 25%; }
-#bubble-anaerobic { top: 90%; left: 62%; }
-#bubble-anaerobic-strict { top: 90%; left: 87%; }
-#bubble-1 { top: 18%; left: 0%; }
-#bubble-2 { top: 12%; left: 41%; }
-#bubble-3 { top: 16%; left: 85%; }
-#bubble-4 { top: 18%; left: 100%; }
-#bubble-5 { top: 81%; left: 41%; }
-#bubble-6 { top: 81%; left: 62%; }
-#bubble-7 { top: 81%; left: 86%; }
+#bubble-aerobic { top: 90%; left: 50%; }
+#bubble-1 { top: 10%; left: 0%; }
+#bubble-3 { top: 6%; left: 85%; }
+#bubble-4 { top: 10%; left: 100%; }
+#bubble-5 { top: 79%; left: 86.5%; }
 
 
 #arrow-1{
-    top: 25%;
+    top: 17%;
     left: 0%;    
 }
 
-#arrow-2{
-    top: 25%;
-    left: 49%;    
-}
-
-#arrow-3{
-    top: 25%;
-    left: 73%;    
-}
-
 #arrow-4{
-    top: 25%;
-    left: 98%;    
+    top: 17%;
+    left: 100%;
 }
 
 #arrow-5{
-    top: 25%;
+    top: 16%;
     left: 85%;    
     transform: translate(-50%, -50%) rotate(180deg);
 }
 
 /* アニメーションレイヤー群のベーススタイル */
 .bubble-animation-layer,
-.microbe-animation-layer,
-.vortex-animation-layer {
+.microbe-animation-layer {
     position: absolute;
     top: 0;
     left: 0;
@@ -53,11 +37,11 @@
 /* 1. 気泡アニメーション */
 .bubble-tank {
     position: absolute;
-    width: 45%;
-    height: 49%;
+    width: 90%;
+    height: 52%;
     border-radius: 4px;
-    top: 27%;
-    left: 3%;
+    top: 22%;
+    left: 5%;
 }
 
 .bubble-tank canvas {
@@ -80,28 +64,33 @@
 
 #microbe-area {
     position: absolute;
-    width: 45%;
-    height: 53%;
+    width: 90%;
+    height: 56%;
     border-radius: 10px;
     overflow: hidden;
-    top: 28%;
-    left: 3%;
+    top: 22%;
+    left: 5%;
 }
 
 /* 微生物をmicrobe-area内で相対位置に配置 */
 #microbe-area .microbe {
     position: absolute;
     opacity: 0; /* 初期状態は透明 */
-    width: 10%;
+    width: 5%;
     height: auto;
 }
 
 /* 微生物の初期位置（microbe-area内での相対位置） */
-#microbe-1 { top: 20px; left: 50px; animation-delay: 0s; }
-#microbe-2 { top: 80px; left: 120px; animation-delay: 1s; }
-#microbe-3 { top: 150px; left: 200px; animation-delay: 2s; }
-#microbe-4 { top: 200px; left: 80px; animation-delay: 3s; }
-#microbe-5 { top: 120px; left: 300px; animation-delay: 4s; }
+#microbe-1a { top: 20px; left: 50px; }
+#microbe-1b { top: 60px; left: 400px; }
+#microbe-2a { top: 80px; left: 120px; }
+#microbe-2b { top: 30px; left: 550px; }
+#microbe-3a { top: 150px; left: 200px; }
+#microbe-3b { top: 100px; left: 650px; }
+#microbe-4a { top: 200px; left: 80px; }
+#microbe-4b { top: 180px; left: 500px; }
+#microbe-5a { top: 120px; left: 300px; }
+#microbe-5b { top: 160px; left: 700px; }
 
 
 /* フェードイン用アニメーション（1回のみ） */
@@ -167,59 +156,39 @@
 }
 
 /* 各微生物に初回フェードイン + ランダムフェード付き無限ループアニメーションを適用 */
-#microbe-1 {
-    animation: fadeIn1 0.5s ease-out 0s forwards, swimWithFade1 17.14s linear 0.5s infinite;  /* 12s / 0.7 */
+#microbe-1a {
+    animation: fadeIn1 0.5s ease-out 0s forwards, swimWithFade1 17.14s linear 0.5s infinite;
+}
+#microbe-1b {
+    animation: fadeIn1 0.5s ease-out 2s forwards, swimWithFade3 14.29s linear 2.5s infinite;
 }
 
-#microbe-2 {
-    animation: fadeIn2 0.5s ease-out 1.6s forwards, swimWithFade2 20s linear 2.1s infinite;  /* 14s / 0.7 */
+#microbe-2a {
+    animation: fadeIn2 0.5s ease-out 1.6s forwards, swimWithFade2 20s linear 2.1s infinite;
+}
+#microbe-2b {
+    animation: fadeIn2 0.5s ease-out 3.5s forwards, swimWithFade4 22.86s linear 4s infinite;
 }
 
-#microbe-3 {
-    animation: fadeIn3 0.5s ease-out 3.2s forwards, swimWithFade3 14.29s linear 3.7s infinite;  /* 10s / 0.7 */
+#microbe-3a {
+    animation: fadeIn3 0.5s ease-out 3.2s forwards, swimWithFade3 14.29s linear 3.7s infinite;
+}
+#microbe-3b {
+    animation: fadeIn3 0.5s ease-out 5s forwards, swimWithFade1 17.14s linear 5.5s infinite;
 }
 
-#microbe-4 {
-    animation: fadeIn4 0.5s ease-out 4.8s forwards, swimWithFade4 22.86s linear 5.3s infinite;  /* 16s / 0.7 */
+#microbe-4a {
+    animation: fadeIn4 0.5s ease-out 4.8s forwards, swimWithFade4 22.86s linear 5.3s infinite;
+}
+#microbe-4b {
+    animation: fadeIn4 0.5s ease-out 6.5s forwards, swimWithFade2 20s linear 7s infinite;
 }
 
-#microbe-5 {
-    animation: fadeIn5 0.5s ease-out 6.4s forwards, swimWithFade5 18.57s linear 6.9s infinite;  /* 13s / 0.7 */
+#microbe-5a {
+    animation: fadeIn5 0.5s ease-out 6.4s forwards, swimWithFade5 18.57s linear 6.9s infinite;
 }
-
-/* 3. 渦アニメーション */
-.vortex-container {
-    position: absolute;
-    width: 22%;
-    height: 55%;
-    pointer-events: none;
-}
-
-.vortex-path {
-    fill: none;
-    stroke: #c09000;
-    stroke-width: 5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-dasharray: 1 12;
-    animation: vortexFlow 1.43s linear infinite;  /* 1s / 0.7 */
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
-}
-
-@keyframes vortexFlow {
-    to {
-        stroke-dashoffset: -10;
-    }
-}
-
-/* 渦の位置 */
-#vortex-anaerobic {
-    top: 27%;
-    left: 51%;
-}
-#vortex-anoxic {
-    top: 27%;
-    left: 75.5%;
+#microbe-5b {
+    animation: fadeIn5 0.5s ease-out 1s forwards, swimWithFade5 18.57s linear 1.5s infinite;
 }
 
 .caption-microbes img{
