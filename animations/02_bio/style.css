@@ -1,24 +1,24 @@
 /* 各吹き出しの位置設定 */
 #bubble-aerobic { top: 90%; left: 50%; }
 #bubble-1 { top: 10%; left: 0%; }
-#bubble-3 { top: 6%; left: 85%; }
-#bubble-4 { top: 10%; left: 100%; }
-#bubble-5 { top: 79%; left: 86.5%; }
+#bubble-2 { top: 6%; left: 85%; }
+#bubble-3 { top: 10%; left: 100%; }
+#bubble-4 { top: 79%; left: 86.5%; }
 
 
 #arrow-1{
     top: 17%;
-    left: 0%;    
+    left: 0%;
 }
 
-#arrow-4{
+#arrow-2{
     top: 17%;
     left: 100%;
 }
 
-#arrow-5{
+#arrow-3{
     top: 16%;
-    left: 85%;    
+    left: 85%;
     transform: translate(-50%, -50%) rotate(180deg);
 }
 
