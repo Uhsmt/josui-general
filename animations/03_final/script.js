@@ -24,7 +24,7 @@ class SuisuiAnimation {
 
   createFish(fishType, index) {
     const fishImg = document.createElement('img');
-    fishImg.src = `../../material/${fishType}.png`;
+    fishImg.src = `../../material/${fishType}.gif`;
     fishImg.alt = fishType;
     fishImg.style.position = 'absolute';
     fishImg.style.width = '40px';
